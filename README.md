@@ -1,4 +1,4 @@
-# Frame Pplayground
+# Frame playground
 
 A playground to showcase multiple components working together.
 
