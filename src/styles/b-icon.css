@@ -1,0 +1,13 @@
+/* B Icon Component Styles */
+.b-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.b-icon-wrapper svg {
+  width: 24px;
+  height: 24px;
+}
