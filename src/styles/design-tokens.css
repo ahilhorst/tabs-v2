@@ -936,6 +936,11 @@ body {
   width: 256px;
 }
 
+/* Animating state - provides visual feedback during drag */
+.nav-rail--animating {
+  transition: width 150ms ease-out;
+}
+
 .nav-rail-header {
   padding-top: 4px;
   display: flex;
@@ -1196,22 +1201,26 @@ body {
   height: calc(100% - 48px); /* Full height minus top 48px */
   cursor: col-resize;
   z-index: 15;
-  transition: opacity 150ms ease-out;
+  transition: width 150ms ease-out, left 150ms ease-out, right 150ms ease-out, opacity 150ms ease-out;
+  right: -2px; /* Center on the edge: half of 4px width */
 }
 
+/* Hover effect - grow equally from both sides */
 .nav-rail-drag-target:hover {
+  width: 12px; /* 4px + 4px + 4px original */
+  right: -6px; /* Center the 12px target: half of 12px width */
   cursor: col-resize;
 }
 
 /* Left drag target (for expanding when collapsed) */
 .nav-rail-drag-target--left {
-  right: 0;
+  right: -2px; /* Center on the edge */
   opacity: 1;
 }
 
 /* Right drag target (for collapsing when expanded) */
 .nav-rail-drag-target--right {
-  right: -4px; /* Position on the right edge of expanded NavRail */
+  right: -2px; /* Center on the edge */
   opacity: 0;
   pointer-events: none;
 }
@@ -1223,7 +1232,7 @@ body {
 
 /* Right drag target (for expanding when collapsed) */
 .nav-rail-drag-target--right-collapsed {
-  right: -4px; /* Position on the right edge of collapsed NavRail */
+  right: -2px; /* Center on the edge */
   opacity: 0;
   pointer-events: none;
 }
@@ -1236,7 +1245,6 @@ body {
 /* Debug overlay for targets */
 .nav-rail-drag-target--debug {
   background: rgba(255, 0, 0, 0.15) !important;
-  border: 1px solid rgba(255, 0, 0, 0.3) !important;
 }
 
 .nav-rail-expand-button--debug {
@@ -1265,10 +1273,12 @@ body {
 /* Header with NavRail */
 .header--with-nav-rail {
   left: 56px; /* Offset by navRail width */
+  transition: left 150ms ease-out;
 }
 
 .header--with-nav-rail-expanded {
   left: 256px; /* Offset by expanded navRail width */
+  transition: left 150ms ease-out;
 }
 
 .header-content {

@@ -47,6 +47,8 @@ export function TitleBar({
   const [isWindows, setIsWindows] = useState(false);
   const [isNavRailEnabled, setIsNavRailEnabled] = useState(false);
   const [isNavRailExpanded, setIsNavRailExpanded] = useState(false);
+  const [isNavRailDragging, setIsNavRailDragging] = useState(false);
+  const [navRailDragProgress, setNavRailDragProgress] = useState(0);
   const [isHeaderEnabled, setIsHeaderEnabled] = useState(false);
   const [isNoTabsEnabled, setIsNoTabsEnabled] = useState(false);
   const [showTargets, setShowTargets] = useState(false);
@@ -162,6 +164,10 @@ export function TitleBar({
                     isEnabled={isNavRailEnabled} 
                     isExpanded={isNavRailExpanded}
                     onExpandChange={setIsNavRailExpanded}
+                    onDragStateChange={(isDragging, progress) => {
+                      setIsNavRailDragging(isDragging);
+                      setNavRailDragProgress(progress);
+                    }}
                     showTargets={showTargets}
                   />
       
@@ -425,6 +431,8 @@ export function TitleBar({
       <Header 
         hasNavRail={isNavRailEnabled} 
         isNavRailExpanded={isNavRailExpanded}
+        isNavRailDragging={isNavRailDragging}
+        navRailDragProgress={navRailDragProgress}
         isEnabled={isHeaderEnabled} 
       />
     </>

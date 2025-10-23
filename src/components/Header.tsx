@@ -11,6 +11,8 @@ interface HeaderProps {
   onBreadcrumbClick?: (item: BreadcrumbItem) => void;
   hasNavRail?: boolean;
   isNavRailExpanded?: boolean;
+  isNavRailDragging?: boolean;
+  navRailDragProgress?: number;
   isEnabled?: boolean;
 }
 
@@ -23,10 +25,35 @@ export function Header({
   onBreadcrumbClick,
   hasNavRail = false,
   isNavRailExpanded = false,
+  isNavRailDragging = false,
+  navRailDragProgress = 0,
   isEnabled = false
 }: HeaderProps) {
+  // Calculate dynamic left position based on NavRail state and drag progress
+  const getHeaderLeft = () => {
+    if (!hasNavRail) return undefined;
+    
+    if (isNavRailDragging) {
+      if (isNavRailExpanded) {
+        // Collapsing: 256px - (progress * 200px)
+        return `${256 - (navRailDragProgress * 200)}px`;
+      } else {
+        // Expanding: 56px + (progress * 200px)
+        return `${56 + (navRailDragProgress * 200)}px`;
+      }
+    }
+    
+    // Static positions
+    return isNavRailExpanded ? '256px' : '56px';
+  };
+
   return (
-    <div className={`header ${hasNavRail ? (isNavRailExpanded ? 'header--with-nav-rail-expanded' : 'header--with-nav-rail') : ''} ${isEnabled ? 'header--visible' : ''}`}>
+    <div 
+      className={`header ${hasNavRail ? (isNavRailExpanded ? 'header--with-nav-rail-expanded' : 'header--with-nav-rail') : ''} ${isEnabled ? 'header--visible' : ''}`}
+      style={{
+        left: getHeaderLeft()
+      }}
+    >
       <div className="header-content">
         {/* Select dropdown placeholder */}
         <div className="header-select">

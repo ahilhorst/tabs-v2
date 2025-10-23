@@ -7,6 +7,7 @@ interface NavRailProps {
   isEnabled?: boolean;
   isExpanded?: boolean;
   onExpandChange?: (expanded: boolean) => void;
+  onDragStateChange?: (isDragging: boolean, progress: number) => void;
   showTargets?: boolean;
 }
 
@@ -16,11 +17,13 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-export function NavRail({ isEnabled = false, isExpanded = false, onExpandChange, showTargets = false }: NavRailProps) {
+export function NavRail({ isEnabled = false, isExpanded = false, onExpandChange, onDragStateChange, showTargets = false }: NavRailProps) {
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [dragProgress, setDragProgress] = useState(0);
   const dragStartX = useRef<number>(0);
-  const dragThreshold = 20; // Minimum drag distance to trigger expansion
+  const dragThreshold = 32; // Minimum drag distance to complete expansion
 
   const navItems: NavItem[] = [
     {
@@ -62,32 +65,52 @@ export function NavRail({ isEnabled = false, isExpanded = false, onExpandChange,
 
   const handleDragStart = useCallback((e: React.MouseEvent) => {
     setIsDragging(true);
+    setIsAnimating(true);
     dragStartX.current = e.clientX;
+    onDragStateChange?.(true, 0);
     e.preventDefault();
-  }, []);
+  }, [onDragStateChange]);
 
   const handleDragMove = useCallback((e: MouseEvent) => {
     if (!isDragging) return;
     
     const deltaX = e.clientX - dragStartX.current;
+    
     if (isExpanded) {
       // When expanded, drag left to collapse
+      const progress = Math.min(Math.abs(deltaX) / dragThreshold, 1);
+      setDragProgress(progress);
+      onDragStateChange?.(true, progress);
+      
       if (deltaX < -dragThreshold) {
         onExpandChange?.(false);
         setIsDragging(false);
+        setIsAnimating(false);
+        setDragProgress(0);
+        onDragStateChange?.(false, 0);
       }
     } else {
       // When collapsed, drag right to expand
+      const progress = Math.min(deltaX / dragThreshold, 1);
+      setDragProgress(progress);
+      onDragStateChange?.(true, progress);
+      
       if (deltaX > dragThreshold) {
         onExpandChange?.(true);
         setIsDragging(false);
+        setIsAnimating(false);
+        setDragProgress(0);
+        onDragStateChange?.(false, 0);
       }
     }
-  }, [isDragging, isExpanded, onExpandChange]);
+  }, [isDragging, isExpanded, onExpandChange, onDragStateChange, dragThreshold]);
 
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
-  }, []);
+    setIsAnimating(false);
+    setDragProgress(0);
+    onDragStateChange?.(false, 0);
+  }, [onDragStateChange]);
 
   // Add global mouse event listeners for drag
   React.useEffect(() => {
@@ -102,7 +125,16 @@ export function NavRail({ isEnabled = false, isExpanded = false, onExpandChange,
   }, [isDragging, handleDragMove, handleDragEnd]);
 
   return (
-    <div className={`nav-rail ${isEnabled ? 'nav-rail--visible' : ''} ${isExpanded ? 'nav-rail--expanded' : ''}`}>
+    <div 
+      className={`nav-rail ${isEnabled ? 'nav-rail--visible' : ''} ${isExpanded ? 'nav-rail--expanded' : ''} ${isAnimating ? 'nav-rail--animating' : ''}`}
+      style={{
+        width: isDragging 
+          ? isExpanded 
+            ? `${256 - (dragProgress * 200)}px` 
+            : `${56 + (dragProgress * 200)}px`
+          : undefined
+      }}
+    >
       {/* B Icon at top */}
       <div className="nav-rail-header">
         <div className="nav-rail-icon-container">
