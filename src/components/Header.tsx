@@ -10,6 +10,7 @@ interface HeaderProps {
   breadcrumbs?: BreadcrumbItem[];
   onBreadcrumbClick?: (item: BreadcrumbItem) => void;
   hasNavRail?: boolean;
+  isNavRailExpanded?: boolean;
   isEnabled?: boolean;
 }
 
@@ -21,10 +22,11 @@ export function Header({
   ],
   onBreadcrumbClick,
   hasNavRail = false,
+  isNavRailExpanded = false,
   isEnabled = false
 }: HeaderProps) {
   return (
-    <div className={`header ${hasNavRail ? 'header--with-nav-rail' : ''} ${isEnabled ? 'header--visible' : ''}`}>
+    <div className={`header ${hasNavRail ? (isNavRailExpanded ? 'header--with-nav-rail-expanded' : 'header--with-nav-rail') : ''} ${isEnabled ? 'header--visible' : ''}`}>
       <div className="header-content">
         {/* Select dropdown placeholder */}
         <div className="header-select">

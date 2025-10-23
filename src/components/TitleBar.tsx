@@ -46,8 +46,10 @@ export function TitleBar({
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isWindows, setIsWindows] = useState(false);
   const [isNavRailEnabled, setIsNavRailEnabled] = useState(false);
+  const [isNavRailExpanded, setIsNavRailExpanded] = useState(false);
   const [isHeaderEnabled, setIsHeaderEnabled] = useState(false);
   const [isNoTabsEnabled, setIsNoTabsEnabled] = useState(false);
+  const [showTargets, setShowTargets] = useState(false);
   const configPanelRef = useRef<HTMLDivElement>(null);
 
   // Recompute how many tabs fit when size changes
@@ -155,8 +157,13 @@ export function TitleBar({
 
   return (
     <>
-      {/* NavRail */}
-      <NavRail isEnabled={isNavRailEnabled} />
+                  {/* NavRail */}
+                  <NavRail 
+                    isEnabled={isNavRailEnabled} 
+                    isExpanded={isNavRailExpanded}
+                    onExpandChange={setIsNavRailExpanded}
+                    showTargets={showTargets}
+                  />
       
       <div 
         className={`title-bar ${isWindows ? 'title-bar--windows' : 'title-bar--macos'}`}
@@ -387,24 +394,39 @@ export function TitleBar({
                 </button>
               </div>
             </div>
-            <div className="config-item">
-              <span className="config-label">Tabs</span>
-              <div className="toggle-switch">
-                <button 
-                  className={`toggle-button ${isNoTabsEnabled ? 'active' : ''}`}
-                  onClick={() => setIsNoTabsEnabled(!isNoTabsEnabled)}
-                >
-                  <div className="toggle-thumb"></div>
-                </button>
-              </div>
-            </div>
+                      <div className="config-item">
+                        <span className="config-label">Tabs</span>
+                        <div className="toggle-switch">
+                          <button 
+                            className={`toggle-button ${isNoTabsEnabled ? 'active' : ''}`}
+                            onClick={() => setIsNoTabsEnabled(!isNoTabsEnabled)}
+                          >
+                            <div className="toggle-thumb"></div>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="config-item">
+                        <span className="config-label">Show targets</span>
+                        <div className="toggle-switch">
+                          <button 
+                            className={`toggle-button ${showTargets ? 'active' : ''}`}
+                            onClick={() => setShowTargets(!showTargets)}
+                          >
+                            <div className="toggle-thumb"></div>
+                          </button>
+                        </div>
+                      </div>
           </div>
         )}
       </div>
     </div>
 
       {/* Header */}
-      <Header hasNavRail={isNavRailEnabled} isEnabled={isHeaderEnabled} />
+      <Header 
+        hasNavRail={isNavRailEnabled} 
+        isNavRailExpanded={isNavRailExpanded}
+        isEnabled={isHeaderEnabled} 
+      />
     </>
   );
 }

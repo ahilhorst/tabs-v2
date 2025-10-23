@@ -23,6 +23,7 @@
   
   /* Icon Colors */
   --stratakit-color-icon-neutral-base: #ACB1B7;
+  --stratakit-color-icon-neutral-hover: #FBFCFD;
   --stratakit-color-icon-accent-strong: #0bfac2;
   
   /* Spacing */
@@ -346,7 +347,7 @@ body {
 }
 
 /* Background */
-.bg-\[rgba\(255,255,255,0\.1\)\] {
+.bg-\[rgba\(255\,255\,255\,0\.1\)\] {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -403,19 +404,19 @@ body {
 }
 
 /* Shadows */
-.shadow-\[inset_var\(--shadow\/control\/button\/base\/inset\/x,0px\)_var\(--shadow\/control\/button\/base\/inset\/y,-1px\)_var\(--shadow\/control\/button\/base\/inset\/blur,0px\)_var\(--shadow\/control\/button\/base\/inset\/spread,0px\)_var\(--shadow\/control\/button\/base\/inset\/color,rgba\(0,0,0,0\.08\)\),inset_var\(--shadow\/control\/button\/base\/border\/x,0px\)_var\(--shadow\/control\/button\/base\/border\/y,0px\)_var\(--shadow\/control\/button\/base\/border\/blur,0px\)_var\(--shadow\/control\/button\/base\/border\/spread,1px\)_var\(--shadow\/control\/button\/base\/border\/color,\#474c53\)\] {
+.shadow-inset-control-button {
   box-shadow: 
     inset var(--shadow-control-button-base-inset-x) var(--shadow-control-button-base-inset-y) var(--shadow-control-button-base-inset-blur) var(--shadow-control-button-base-inset-spread) var(--shadow-control-button-base-inset-color),
     inset var(--shadow-control-button-base-border-x) var(--shadow-control-button-base-border-y) var(--shadow-control-button-base-border-blur) var(--shadow-control-button-base-border-spread) var(--shadow-control-button-base-border-color);
 }
 
-.shadow-\[var\(--shadow\/control\/button\/base\/layer1\/x,0px\)_var\(--shadow\/control\/button\/base\/layer1\/y,1px\)_var\(--shadow\/control\/button\/base\/layer1\/blur,1px\)_var\(--shadow\/control\/button\/base\/layer1\/spread,-0\.5px\)_var\(--shadow\/control\/button\/base\/layer1\/color,rgba\(0,0,0,0\.16\)\),var\(--shadow\/control\/button\/base\/layer2\/x,0px\)_var\(--shadow\/control\/button\/base\/layer2\/y,3px\)_var\(--shadow\/control\/button\/base\/layer2\/blur,3px\)_var\(--shadow\/control\/button\/base\/layer2\/spread,-1\.5px\)_var\(--shadow\/control\/button\/base\/layer2\/color,rgba\(0,0,0,0\.16\)\)\] {
+.shadow-control-button-layers {
   box-shadow: 
     var(--shadow-control-button-base-layer1-x) var(--shadow-control-button-base-layer1-y) var(--shadow-control-button-base-layer1-blur) var(--shadow-control-button-base-layer1-spread) var(--shadow-control-button-base-layer1-color),
     var(--shadow-control-button-base-layer2-x) var(--shadow-control-button-base-layer2-y) var(--shadow-control-button-base-layer2-blur) var(--shadow-control-button-base-layer2-spread) var(--shadow-control-button-base-layer2-color);
 }
 
-.shadow-\[0px_1px_0px_0px_inset_rgba\(255,255,255,0\.1\)\] {
+.shadow-inset-white {
   box-shadow: 0px 1px 0px 0px inset rgba(255, 255, 255, 0.1);
 }
 
@@ -924,18 +925,23 @@ body {
   border-right: 1px solid var(--stratakit-color-border-neutral-muted);
   z-index: 5;
   transform: translateX(-100%);
-  transition: transform 150ms ease-out;
+  transition: transform 150ms ease-out, width 150ms ease-out;
 }
 
 .nav-rail.nav-rail--visible {
   transform: translateX(0);
 }
 
+.nav-rail.nav-rail--expanded {
+  width: 256px;
+}
+
 .nav-rail-header {
   padding-top: 4px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
+  padding-left: 8px;
 }
 
 .nav-rail-icon-container {
@@ -946,6 +952,8 @@ body {
   justify-content: center;
   cursor: pointer;
   border-radius: 6px;
+  position: relative;
+  z-index: 1;
 }
 
 .nav-rail-icon-wrapper {
@@ -980,7 +988,15 @@ body {
   width: 32px;
   height: 1px;
   background: var(--stratakit-color-border-neutral-muted);
-  margin: 4px auto;
+  margin: 4px 0;
+  margin-left: 8px; /* Fixed left position - no centering */
+  transition: width 150ms ease-out;
+}
+
+/* Expanded state - divider grows from its current left position */
+.nav-rail--expanded .nav-rail-divider {
+  width: calc(100% - 16px); /* Full width minus left/right padding (8px each) */
+  margin-left: 8px; /* Same left position - no movement */
 }
 
 .nav-rail-items {
@@ -999,11 +1015,20 @@ body {
   justify-content: center;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 150ms ease-out, border 150ms ease-out;
+  transition: background-color 150ms ease-out, border 150ms ease-out, width 150ms ease-out, padding 150ms ease-out;
   position: relative;
   background: transparent;
   border: 1px solid transparent;
   padding: 4px 8px;
+}
+
+/* Expanded state styling - maintain height, just make wider */
+.nav-rail--expanded .nav-rail-item {
+  width: auto;
+  height: 40px; /* Keep same height as collapsed state */
+  justify-content: flex-start;
+  padding: 4px 8px; /* Keep same padding as collapsed state */
+  gap: 8px;
 }
 
 .nav-rail-item:hover {
@@ -1021,11 +1046,43 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .nav-rail-item-icon svg {
   width: 17.89px;
   height: 17.89px;
+  fill: var(--stratakit-color-icon-neutral-base);
+}
+
+/* Active state - use strong icon color */
+.nav-rail-item.active .nav-rail-item-icon svg {
+  fill: var(--stratakit-color-icon-accent-strong);
+}
+
+/* NavRail item label - only visible when expanded */
+.nav-rail-item-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 16px;
+  color: var(--stratakit-color-text-neutral-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  transition: color 150ms ease-out;
+}
+
+/* Hover state - use primary text color */
+.nav-rail-item:hover .nav-rail-item-label {
+  color: var(--stratakit-color-text-neutral-primary);
+}
+
+/* Active state - use primary text color */
+.nav-rail-item.active .nav-rail-item-label {
+  color: var(--stratakit-color-text-neutral-primary);
 }
 
 .nav-rail-tooltip {
@@ -1057,6 +1114,136 @@ body {
   opacity: 1;
 }
 
+/* Hide tooltip when expanded since labels are visible */
+.nav-rail--expanded .nav-rail-tooltip {
+  display: none;
+}
+
+/* NavRail Expand Button */
+.nav-rail-expand-button {
+  position: absolute;
+  right: -8px; /* Center on the edge: half of 16px button width */
+  top: 16px; /* 16px from the top of the NavRail container */
+  width: 16px;
+  height: 16px;
+  background: var(--stratakit-color-bg-page-depth);
+  border: 1px solid var(--stratakit-color-border-neutral-muted);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 100ms ease-out;
+  box-shadow: 
+    inset 0px -1px 0px 0px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-rail.nav-rail--visible .nav-rail-expand-button {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-rail-expand-button:hover {
+  /* No background color change on hover */
+}
+
+.nav-rail-expand-icon {
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 100ms ease-out;
+  transform: translateX(0.5px); /* Move chevron 0.5px right for optical alignment */
+}
+
+.nav-rail-expand-icon svg {
+  transition: transform 100ms ease-out;
+}
+
+.nav-rail-expand-icon svg path {
+  transition: stroke 100ms ease-out;
+}
+
+.nav-rail-expand-button:hover .nav-rail-expand-icon svg {
+  transform: translateX(0.5px); /* Only move 0.5px on hover (total 1px from base position) */
+}
+
+.nav-rail-expand-button:hover .nav-rail-expand-icon svg path {
+  stroke: var(--stratakit-color-icon-neutral-hover);
+}
+
+.nav-rail-expand-icon svg.expanded {
+  transform: rotate(180deg);
+}
+
+.nav-rail-expand-button:hover .nav-rail-expand-icon svg.expanded {
+  transform: rotate(180deg) translateX(0.5px); /* Only move 0.5px on hover (total 1px from base position) */
+}
+
+.nav-rail-expand-button:hover .nav-rail-expand-icon svg.expanded path {
+  stroke: var(--stratakit-color-icon-neutral-hover);
+}
+
+/* NavRail Drag Target */
+.nav-rail-drag-target {
+  position: absolute;
+  top: 48px; /* Start below the B icon area */
+  width: 4px;
+  height: calc(100% - 48px); /* Full height minus top 48px */
+  cursor: col-resize;
+  z-index: 15;
+  transition: opacity 150ms ease-out;
+}
+
+.nav-rail-drag-target:hover {
+  cursor: col-resize;
+}
+
+/* Left drag target (for expanding when collapsed) */
+.nav-rail-drag-target--left {
+  right: 0;
+  opacity: 1;
+}
+
+/* Right drag target (for collapsing when expanded) */
+.nav-rail-drag-target--right {
+  right: -4px; /* Position on the right edge of expanded NavRail */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-rail-drag-target--right.nav-rail-drag-target--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Right drag target (for expanding when collapsed) */
+.nav-rail-drag-target--right-collapsed {
+  right: -4px; /* Position on the right edge of collapsed NavRail */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-rail-drag-target--right-collapsed.nav-rail-drag-target--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Debug overlay for targets */
+.nav-rail-drag-target--debug {
+  background: rgba(255, 0, 0, 0.15) !important;
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+}
+
+.nav-rail-expand-button--debug {
+  background: rgba(255, 0, 0, 0.15) !important;
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+}
+
 /* Header */
 .header {
   position: fixed;
@@ -1078,6 +1265,10 @@ body {
 /* Header with NavRail */
 .header--with-nav-rail {
   left: 56px; /* Offset by navRail width */
+}
+
+.header--with-nav-rail-expanded {
+  left: 256px; /* Offset by expanded navRail width */
 }
 
 .header-content {
